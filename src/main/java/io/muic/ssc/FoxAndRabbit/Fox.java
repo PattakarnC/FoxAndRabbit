@@ -53,7 +53,8 @@ public class Fox extends Animal {
      * @param field The field currently occupied.
      * @param newFoxes A list to return newly born foxes.
      */
-    public void hunt(List<Fox> newFoxes) {
+    @Override
+    protected void act(List<Animal> newFoxes) {
         incrementAge();
         incrementHunger();
         if (isAlive()) {

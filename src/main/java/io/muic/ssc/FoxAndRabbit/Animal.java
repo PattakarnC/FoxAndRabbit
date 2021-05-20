@@ -107,6 +107,8 @@ public abstract class Animal {
 
     protected abstract Animal createYoung(boolean randomAge, Field field, Location location);
 
+    protected abstract void act(List<Animal> newAnimals);
+
     /**
      * Check whether or not this rabbit is to give birth at this step. New
      * births will be made into free adjacent locations.
