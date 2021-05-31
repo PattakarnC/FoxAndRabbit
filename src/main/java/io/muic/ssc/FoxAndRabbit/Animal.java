@@ -4,19 +4,26 @@ import java.util.List;
 import java.util.Random;
 
 public abstract class Animal {
-    // Whether the animal is alive or not.
-    private boolean alive;
 
+    // Whether the animal is alive or not.
+    private boolean alive = true;
     // The fox's position.
     protected Location location;
     // The field occupied.
     protected Field field;
     // Individual characteristics (instance fields).
     // The fox's age.
-    protected int age;
+    protected int age = 0;
 
     private static final Random RANDOM = new Random();
 
+    public void initialize(boolean randomAge, Field field, Location location) {
+        this.field = field;
+        setLocation(location);
+        if (randomAge) {
+            age = RANDOM.nextInt(getMaxAge());
+        }
+    }
 
     /**
      * Check whether the animal is alive or not.
@@ -36,11 +43,10 @@ public abstract class Animal {
      *
      * @return The fox's location.
      */
+
     public Location getLocation() {
         return location;
     }
-
-    public abstract int getMaxAge();
 
     /**
      * Increase the age. This could result in the rabbit's death.
@@ -51,7 +57,6 @@ public abstract class Animal {
             setDead();
         }
     }
-
 
     /**
      * Indicate that the fox is no longer alive. It is removed from the field.
@@ -83,7 +88,7 @@ public abstract class Animal {
      *
      * @return The number of births (may be zero).
      */
-    protected int breed() {
+    public int breed() {
         int births = 0;
         if (canBreed() && RANDOM.nextDouble() <= getBreedingProbability()) {
             births = RANDOM.nextInt(getMaxLitterSize()) + 1;
@@ -91,8 +96,21 @@ public abstract class Animal {
         return births;
     }
 
-    protected abstract double getBreedingProbability();
-    protected abstract int getMaxLitterSize();
+    public void act(List<Animal> newAnimals) {
+        incrementAge();
+        if (isAlive()) {
+            giveBirth(newAnimals);
+
+            Location newLocation = moveToNewLocation();
+
+            if (newLocation != null) {
+                setLocation(newLocation);
+            }
+            else {
+                setDead();
+            }
+        }
+    }
 
     /**
      * A rabbit can breed if it has reached the breeding age.
@@ -103,27 +121,36 @@ public abstract class Animal {
         return age >= getBreedingAge();
     }
 
-    protected abstract int getBreedingAge();
-
-    protected abstract Animal createYoung(boolean randomAge, Field field, Location location);
-
-    protected abstract void act(List<Animal> newAnimals);
+    private Animal createYoung(boolean randomAge, Field field, Location location) {
+        return AnimalFactory.createAnimal(this.getClass(), field, location);
+    }
 
     /**
      * Check whether or not this rabbit is to give birth at this step. New
      * births will be made into free adjacent locations.
      *
-     * @param newRabbits A list to return newly born rabbits.
+     * @param newAnimals A list to return newly born rabbits.
      */
-    protected void giveBirth(List newRabbits) {
-        // New rabbits are born into adjacent locations.
+    protected void giveBirth(List newAnimals) {
+        // New animals are born into adjacent locations.
         // Get a list of adjacent free locations.
         List<Location> free = field.getFreeAdjacentLocations(location);
         int births = breed();
         for (int b = 0; b < births && free.size() > 0; b++) {
             Location loc = free.remove(0);
             Animal young = createYoung(false, field, loc);
-            newRabbits.add(young);
+            newAnimals.add(young);
         }
     }
+
+    public abstract Location moveToNewLocation();
+
+    protected abstract double getBreedingProbability();
+
+    protected abstract int getMaxLitterSize();
+
+    protected abstract int getBreedingAge();
+
+    public abstract int getMaxAge();
+
 }

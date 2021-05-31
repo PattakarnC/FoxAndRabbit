@@ -18,31 +18,13 @@ public class Rabbit extends Animal {
     private static final Random RANDOM = new Random();
 
     /**
-     * Create a new rabbit. A rabbit may be created with age zero (a new born)
-     * or with a random age.
-     *
-     * @param randomAge If true, the rabbit will have a random age.
-     * @param field The field currently occupied.
-     * @param location The location within the field.
-     */
-    public Rabbit(boolean randomAge, Field field, Location location) {
-        age = 0;
-        setAlive(true);
-        this.field = field;
-        setLocation(location);
-        if (randomAge) {
-            age = RANDOM.nextInt(MAX_AGE);
-        }
-    }
-
-    /**
      * This is what the rabbit does most of the time - it runs around. Sometimes
      * it will breed or die of old age.
      *
      * @param newRabbits A list to return newly born rabbits.
      */
     @Override
-    protected void act(List<Animal> newRabbits) {
+    public void act(List<Animal> newRabbits) {
         incrementAge();
         if (isAlive()) {
             giveBirth(newRabbits);
@@ -55,6 +37,11 @@ public class Rabbit extends Animal {
                 setDead();
             }
         }
+    }
+
+    @Override
+    public Location moveToNewLocation() {
+        return field.freeAdjacentLocation(getLocation());
     }
 
     @Override
@@ -75,10 +62,5 @@ public class Rabbit extends Animal {
     @Override
     protected int getBreedingAge() {
         return BREEDING_AGE;
-    }
-
-    @Override
-    protected Animal createYoung(boolean randomAge, Field field, Location location) {
-        return new Rabbit(randomAge, field, location);
     }
 }
