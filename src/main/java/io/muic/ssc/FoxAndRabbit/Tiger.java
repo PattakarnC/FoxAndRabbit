@@ -1,35 +1,35 @@
 package io.muic.ssc.FoxAndRabbit;
 
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
-public class Fox extends Animal {
-    // Characteristics shared by all foxes (class variables).
+public class Tiger extends Animal {
+    // Characteristics shared by all tigers (class variables).
 
-    // The age at which a fox can start to breed.
-    private static final int BREEDING_AGE = 15;
-    // The age to which a fox can live.
-    private static final int MAX_AGE = 150;
+    // The age at which a tiger can start to breed.
+    private static final int BREEDING_AGE = 30;
+    // The age to which a tiger can live.
+    private static final int MAX_AGE = 200;
     // The maximum number of births.
     private static final int MAX_LITTER_SIZE = 2;
     // Random generator
     private static final Random RANDOM = new Random();
 
-    // The fox's food level, which is increased by eating rabbits.
+    // The tiger's food level, which is increased by eating rabbits and foxes.
     private int foodLevel;
 
     @Override
     public void initialize(boolean randomAge, Field field, Location location) {
         super.initialize(randomAge, field, location);
-        foodLevel = RANDOM.nextInt(AnimalType.RABBIT.getFoodValue());
+        foodLevel = RANDOM.nextInt(AnimalType.FOX.getFoodValue());
     }
 
     /**
-     * This is what the fox does most of the time: it hunts for rabbits. In the
+     * This is what the tiger does most of the time: it hunts for rabbits and foxes. In the
      * process, it might breed, die of hunger, or die of old age.
      *
-     * @param newAnimal A list to return newly born foxes.
+     * @param newAnimal A list to return newly born tigers.
      */
     @Override
     public void act(List<Animal> newAnimal) {
@@ -48,7 +48,7 @@ public class Fox extends Animal {
     }
 
     /**
-     * Make this fox more hungry. This could result in the fox's death.
+     * Make this tiger more hungry. This could result in the tiger's death.
      */
     private void incrementHunger() {
         foodLevel--;
@@ -58,8 +58,8 @@ public class Fox extends Animal {
     }
 
     /**
-     * Look for rabbits adjacent to the current location. Only the first live
-     * rabbit is eaten.
+     * Look for rabbits and foxes adjacent to the current location. Only the first live
+     * rabbit and fox is eaten.
      *
      * @return Where food was found, or null if it wasn't.
      */
@@ -77,6 +77,14 @@ public class Fox extends Animal {
                     return where;
                 }
             }
+            else if (animal instanceof Fox) {
+                Fox fox = (Fox) animal;
+                if (fox.isAlive()) {
+                    fox.setDead();
+                    foodLevel = AnimalType.FOX.getFoodValue();
+                    return where;
+                }
+            }
         }
         return null;
     }
@@ -88,7 +96,7 @@ public class Fox extends Animal {
 
     @Override
     protected double getBreedingProbability() {
-        return AnimalType.FOX.getBreedingProbability();
+        return AnimalType.TIGER.getBreedingProbability();
     }
 
     @Override
