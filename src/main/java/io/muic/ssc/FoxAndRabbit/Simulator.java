@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Simulator {
+public class Simulator implements Observable {
     // Constants representing configuration information for the simulation.
     // The default width for the grid.
     private static final int DEFAULT_WIDTH = 120;
@@ -21,6 +21,9 @@ public class Simulator {
     private int step;
     // A graphical view of the simulation.
     private SimulatorView view;
+
+    private ArrayList<Observer> observers = new ArrayList<>();
+
 
     /**
      * Construct a simulation field with default size.
@@ -52,6 +55,8 @@ public class Simulator {
         for (int i = 0; i < animalTypes.length; i++) {
             view.setColor(animalTypes[i].getAnimalClass(), animalTypes[i].getColor());
         }
+
+        attach(view);
 
         // Setup a valid starting point.
         reset();
@@ -99,7 +104,7 @@ public class Simulator {
         // Add the newly born foxes and rabbits to the main lists.
         animals.addAll(newAnimals);
 
-        view.showStatus(step, field);
+        notifyObserver(step, field);
     }
 
     /**
@@ -110,8 +115,7 @@ public class Simulator {
         animals.clear();
         populate();
 
-        // Show the starting state in the view.
-        view.showStatus(step, field);
+        notifyObserver(step, field);
     }
 
     /**
@@ -131,6 +135,25 @@ public class Simulator {
             Thread.sleep(millisec);
         } catch (InterruptedException ie) {
             // wake up
+        }
+    }
+
+    @Override
+    public void attach(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void detach(Observer o) {
+        int observerIndex = observers.indexOf(o);
+        System.out.println("Observer " + (observerIndex + 1) + " deleted");
+        observers.remove(observerIndex);
+    }
+
+    @Override
+    public void notifyObserver(int step, Field field) {
+        for (Observer observer : observers) {
+            observer.update(step, field);
         }
     }
 }

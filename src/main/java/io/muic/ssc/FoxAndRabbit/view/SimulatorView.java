@@ -2,6 +2,7 @@ package io.muic.ssc.FoxAndRabbit.view;
 
 import io.muic.ssc.FoxAndRabbit.Field;
 import io.muic.ssc.FoxAndRabbit.FieldStats;
+import io.muic.ssc.FoxAndRabbit.Observer;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -16,7 +17,8 @@ import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-public class SimulatorView extends JFrame {
+
+public class SimulatorView extends JFrame implements Observer {
 
     // Colors used for empty locations.
     private static final Color EMPTY_COLOR = Color.white;
@@ -155,6 +157,11 @@ public class SimulatorView extends JFrame {
      */
     public boolean isViable(Field field) {
         return stats.isViable(field);
+    }
+
+    @Override
+    public void update(int step, Field field) {
+        showStatus(step, field);
     }
 
     /**
